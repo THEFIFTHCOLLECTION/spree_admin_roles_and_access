@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'rails', '4.0.3'
+gem 'rails', "4.1.11"
 gem 'mysql2'
 # Gems used only for assets and not required
 # in production environments by default.
@@ -14,9 +14,9 @@ group :test do
   gem 'database_cleaner', '1.2.0'
 end
 
-gem 'spree', '2.2.0'
+gem 'spree', '~>2.3'
 
 # Provides basic authentication functionality for testing parts of your engine
-gem 'spree_auth_devise', github: 'spree/spree_auth_devise', branch: '2-2-stable'
+gem 'spree_auth_devise', github: 'spree/spree_auth_devise', branch: '2-3-stable'
 
 gemspec

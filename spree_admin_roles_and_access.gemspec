@@ -10,9 +10,9 @@ Gem::Specification.new do |s|
   s.author    = "Nishant 'CyRo' Tuteja"
   s.email     = 'info@vinsol.com'
   s.homepage  = 'http://vinsol.com'
-  
+
   s.require_path = 'lib'
   s.requirements << 'none'
 
-  s.add_dependency 'spree_core', '~> 2.2'
+  s.add_dependency 'spree_core', '~> 2.3'
 end
