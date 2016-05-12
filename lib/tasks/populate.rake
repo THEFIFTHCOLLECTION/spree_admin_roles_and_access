@@ -10,8 +10,8 @@ namespace :spree_roles do
       user.is_default = true
       user.save!
 
-      admin-permissions = Spree::Permission.where(title: 'can-manage-all', priority: 0).first_or_create!
-      default-permissions = Spree::Permission.where(title: 'default-permissions', priority: 1).first_or_create!
+      admin_permissions = Spree::Permission.where(title: 'can-manage-all', priority: 0).first_or_create!
+      default_permissions = Spree::Permission.where(title: 'default-permissions', priority: 1).first_or_create!
 
       [ 'orders','products','variants','images','taxons','taxonomies',
         'option_types','option_values','product_properties','properties',
@@ -29,51 +29,53 @@ namespace :spree_roles do
           Spree::Permission.where(title: "can-create-spree/#{model}", priority: 4).first_or_create!
         end
 
-      reports-model = Spree::Permission.where(title: 'can-read-spree/admin/reports', priority: 3).first_or_create!
+      reports_model = Spree::Permission.where(title: 'can-read-spree/admin/reports', priority: 3).first_or_create!
 
       to_build = []
 
-      admin.permissions = [ admin-permissions ]
-      user.permissions = [ default-permissions ]
+      admin.permissions = [ admin_permissions ]
+      user.permissions = [ default_permissions ]
 
-      manager.permissions = [ default-permissions ]
+      manager.permissions = [ default_permissions ]
       to_build << { manager =>
         {"can" =>
-          [{ "manage" =>
-            ['products', 'orders', 'stocks', 'option_types', 'taxonomies', 'images', 'product_properties', 'stocks']
-          }]
+          { "manage" =>
+            ['products', 'orders', 'stock_items', 'option_types', 'taxonomies', 'images', 'product_properties', 'stock_locations']
+          }
         }
       }
 
-      customer_service.permissions =  [ default-permissions ]
+      customer_service.permissions =  [ default_permissions ]
       to_build << { customer_service =>
         {
           "can" =>
-            [{ "manage" => ['orders'] }],
+            { "manage" => ['orders'] },
           "cannot" =>
-            [{ "create" => ['orders'] }]
+            { "create" => ['orders'] }
         }
       }
 
-      warehouse.permissions = [ default-permissions ]
+      warehouse.permissions = [ default_permissions ]
       to_build << { warehouse =>
         {
           "can" =>
-            [{ "manage" =>
+            { "manage" =>
               ['products','stock_locations','orders',
                 'stock_items']
-            }],
+            },
           "cannot" =>
-            [{ "create" => ['orders'] }]
+            { "create" => ['orders'] }
         }
       }
 
       # build the permissions here
-      to_build.each_pair do |role, perm_grps|
-        perm_grps.each_pair do |cancan, perms|
-          perms.each_pair do |model, actions|
-            actions.each do |action|
-              role.permissions << Spree::Permission.find_by(title: "#{cancan}-#{action}-spree/#{model}")
+      to_build.each do |role_grp|
+        role_grp.each_pair do |role, perm_grps|
+          perm_grps.each_pair do |cancan, perms|
+            perms.each_pair do |action, models|
+              models.each do |model|
+                role.permissions << Spree::Permission.find_by(title: "#{cancan}-#{action}-spree/#{model}")
+              end
             end
           end
         end
