@@ -20,7 +20,9 @@ namespace :spree_roles do
           Spree::Permission.where(title: "cannot-index-spree/#{model}", priority: 2).first_or_create!
           Spree::Permission.where(title: "cannot-update-spree/#{model}", priority: 2).first_or_create!
           Spree::Permission.where(title: "cannot-create-spree/#{model}", priority: 2).first_or_create!
+
           Spree::Permission.where(title: "can-manage-spree/#{model}", priority: 3).first_or_create!
+
           Spree::Permission.where(title: "can-read-spree/#{model}", priority: 4).first_or_create!
           Spree::Permission.where(title: "can-index-spree/#{model}", priority: 4).first_or_create!
           Spree::Permission.where(title: "can-update-spree/#{model}", priority: 4).first_or_create!
@@ -29,29 +31,54 @@ namespace :spree_roles do
 
       reports-model = Spree::Permission.where(title: 'can-read-spree/admin/reports', priority: 3).first_or_create!
 
+      to_build = []
+
       admin.permissions = [ admin-permissions ]
       user.permissions = [ default-permissions ]
+
       manager.permissions = [ default-permissions ]
+      to_build << { manager =>
+        {"can" =>
+          [{ "manage" =>
+            ['products', 'orders', 'stocks', 'option_types', 'taxonomies', 'images', 'product_properties', 'stocks']
+          }]
+        }
+      }
+
       customer_service.permissions =  [ default-permissions ]
+      to_build << { customer_service =>
+        {
+          "can" =>
+            [{ "manage" => ['orders'] }],
+          "cannot" =>
+            [{ "create" => ['orders'] }]
+        }
+      }
+
       warehouse.permissions = [ default-permissions ]
+      to_build << { warehouse =>
+        {
+          "can" =>
+            [{ "manage" =>
+              ['products','stock_locations','orders',
+                'stock_items']
+            }],
+          "cannot" =>
+            [{ "create" => ['orders'] }]
+        }
+      }
 
-      ['products', 'orders', 'stocks', 'option_types', 'taxonomies', 'images', 'product_properties', 'stocks'].each do |model|
-        manager.permissions << Spree::Permission.find_by(title: "can-manage-spree/#{model}")
+      # build the permissions here
+      to_build.each_pair do |role, perm_grps|
+        perm_grps.each_pair do |cancan, perms|
+          perms.each_pair do |model, actions|
+            actions.each do |action|
+              role.permissions << Spree::Permission.find_by(title: "#{cancan}-#{action}-spree/#{model}")
+            end
+          end
+        end
       end
 
-      ['orders'].each do |model|
-        customer_service.permissions << Spree::Permission.find_by(title: "can-manage-spree/#{model}")
-      end
-      [{"orders" => 'create'}].each |model, action| do
-        customer_service.permissions << Spree::Permission.find_by(title: "cannot-#{action}-spree/#{model}")
-      end
-
-      ['products','stock_locations','orders','stock_items'].each do |model|
-        warehouse.permissions << Spree::Permission.find_by(title: "can-manage-spree/#{model}")
-      end
-      [{"orders" => 'create'}].each |model, action| do
-        warehouse.permissions << Spree::Permission.find_by(title: "cannot-#{action}-spree/#{model}")
-      end
     end
   end
 end
