@@ -13,9 +13,7 @@ namespace :spree_roles do
       admin_permissions = Spree::Permission.where(title: 'can-manage-all', priority: 0).first_or_create!
       default_permissions = Spree::Permission.where(title: 'default-permissions', priority: 1).first_or_create!
 
-      [ 'orders','products','variants','images','taxons','taxonomies',
-        'option_types','option_values','product_properties','properties',
-        'stock_items','stock_locations','promotions','sales','users','sellers','account_sales_records'].each do |model|
+      [ 'orders','addresses','payments','creditcard_payments','shipments','shipping_categories', 'tax_categories','credit_cards','return_authorizations', 'products','variants','images','taxons','taxonomies','prices', 'option_types','option_values','product_properties','properties','prototypes', 'stock_items','stock_locations','inventory_unit', 'promotions', 'promotion_actions', 'promotion_rules', 'sales','sale_batches','sale_items', 'users','sellers','account_sales_records', 'preferences'].each do |model|
           Spree::Permission.where(title: "cannot-read-spree/#{model}", priority: 2).first_or_create!
           Spree::Permission.where(title: "cannot-index-spree/#{model}", priority: 2).first_or_create!
           Spree::Permission.where(title: "cannot-update-spree/#{model}", priority: 2).first_or_create!
@@ -40,7 +38,7 @@ namespace :spree_roles do
       to_build << { manager =>
         {"can" =>
           { "manage" =>
-            ['products', 'orders', 'stock_items', 'option_types', 'taxonomies', 'images', 'product_properties', 'stock_locations']
+            ['products', 'variants','prices','orders','addresses','payments','line_items','stock_items', 'option_types', 'taxonomies', 'taxons', 'images', 'product_properties', 'stock_locations']
           }
         }
       }
