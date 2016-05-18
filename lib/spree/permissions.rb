@@ -30,6 +30,9 @@ module Spree
       current_ability.can :read, Spree::Address do |address|
         address.user == user
       end
+      # also need these for the js calls to fill in dropdown on checkout
+      current_ability.can :read, Spree::State
+      current_ability.can :read, Spree::Country
     end
 
     define_method('default-admin-permissions') do |current_ability, user|
